@@ -49,53 +49,85 @@ class NoteListState extends State<NoteList> {
         return Card(
           color: Colors.white,
           elevation: 2.0,
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor:
-                  getPriorityColor(this.noteList[position].priority),
-              child: getPriorityIcon(this.noteList[position].priority),
-            ),
-            title: Text(
-              this.noteList[position].title,
-              style: titleStyle,
-            ),
-            subtitle: Text(this.noteList[position].date),
-            trailing: GestureDetector(
-              child: Icon(
-                Icons.delete,
-                color: Colors.grey,
-              ),
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (_) {
-                      return AlertDialog(
-                        title: Text("Delete This Note?"),
-                        content: Text(
-                            'This Note Will Be Deleted Permanently. Are You Sure?'),
-                        actions: [
-                          FlatButton(
-                            child: Text('Cancel'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          FlatButton(
-                            child: Text('Delete'),
-                            onPressed: () {
-                              _delete(context, noteList[position]);
-                              Navigator.pop(context);
-                            },
-                          ),
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: 20.0),
+              ExpansionTile(
+                maintainState: false,
+                leading: CircleAvatar(
+                  backgroundColor:
+                      getPriorityColor(this.noteList[position].priority),
+                  child: getPriorityIcon(this.noteList[position].priority),
+                ),
+                title: Text(
+                  this.noteList[position].title,
+                  style: titleStyle,
+                ),
+                children: <Widget>[
+                  ListTile(
+                    //trailing:  Text('DATE:- '),
+                    // leading: Text('DATE:- '),
+                    leading: Text(this.noteList[position].date ?? ""),
+                  ),
+                  ListTile(
+                    title: Text('Description '),
+                    subtitle: Text(
+                      this.noteList[position].description ?? "",
+                      style: titleStyle,
+                    ),
+                  ),
+                  ListTile(
+                    leading: RaisedButton(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Icon(Icons.edit),
+                          Text(' EDIT'),
                         ],
-                      );
-                    });
-              },
-            ),
-            onTap: () {
-              debugPrint("ListTile Tapped");
-              navigateToDetail(this.noteList[position], 'Edit Note');
-            },
+                      ),
+                      onPressed: () {
+                        navigateToDetail(this.noteList[position], 'Edit Note');
+                      },
+                    ),
+                    trailing: RaisedButton(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Icon(Icons.delete),
+                          Text(' DELETE'),
+                        ],
+                      ),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (_) {
+                              return AlertDialog(
+                                title: Text("Delete This Note?"),
+                                content: Text(
+                                    'This Note Will Be Deleted Permanently. Are You Sure?'),
+                                actions: [
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text('Delete'),
+                                    onPressed: () {
+                                      _delete(context, noteList[position]);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         );
       },
