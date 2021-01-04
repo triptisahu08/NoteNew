@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_notes/models/note.dart';
 import 'package:flutter_app_notes/utils/database_helper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class NoteDetail extends StatefulWidget {
@@ -23,6 +24,9 @@ class NoteDetailState extends State<NoteDetail> {
 
   String appBarTitle;
   Note note;
+
+  PickedFile _imageFile;
+  final ImagePicker _picker = ImagePicker();
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -56,7 +60,9 @@ class NoteDetailState extends State<NoteDetail> {
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
             child: ListView(
               children: <Widget>[
-                // First element
+
+                // First element (Priority Selector)
+                
                 ListTile(
                   title: DropdownButton(
                       items: _priorities.map((String dropDownStringItem) {
@@ -75,7 +81,7 @@ class NoteDetailState extends State<NoteDetail> {
                       }),
                 ),
 
-                // Second Element
+                // Second Element (Title)
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: TextField(
@@ -93,7 +99,7 @@ class NoteDetailState extends State<NoteDetail> {
                   ),
                 ),
 
-                // Third Element
+                // Third Element (Description)
                 Padding(
 
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
@@ -113,7 +119,46 @@ class NoteDetailState extends State<NoteDetail> {
                   ),
                 ),
 
-                // Fourth Element
+                // Fourth Element (Image Picker Icon Button)
+                Padding(
+                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                  child:  IconButton(
+                    icon: Icon(Icons.image_search_sharp),
+                    iconSize: 50,
+                    color: Colors.brown,
+                    tooltip: 'Select/Capture Image',
+                    onPressed: () {
+                      debugPrint("Icon Button Clicked");
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SimpleDialog(
+                                title: Text("Camera/Gallery"),
+                                children: <Widget>[
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);//close the dialog box
+                                      _getImage(ImageSource.gallery);
+                                    },
+                                    child: const Text('Pick From Gallery'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);//close the dialog box
+                                      _getImage(ImageSource.camera);
+                                    },
+                                    child: const Text('Take A New Picture'),
+                                  ),
+                                ]);
+                          });
+                      // setState(() {
+                      //
+                      // });
+                    },
+                  ),
+                ),
+
+                // Fifth Element (Button)
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: Row(
@@ -162,6 +207,20 @@ class NoteDetailState extends State<NoteDetail> {
             ),
           ),
         ));
+  }
+
+  _getImage(ImageSource src) async {
+    debugPrint(src.toString());
+    try{
+      final pickedFile = await _picker.getImage(source: src);
+      setState(() {
+        _imageFile = pickedFile;
+      });
+      debugPrint(_imageFile.path);
+    }
+    catch (exception){
+      debugPrint(exception.toString());
+      }
   }
 
   void moveToLastScreen() {
