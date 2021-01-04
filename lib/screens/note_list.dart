@@ -16,6 +16,7 @@ class NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
   int count = 0;
+  int _activeMeterIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -49,83 +50,112 @@ class NoteListState extends State<NoteList> {
         return Card(
           color: Colors.white,
           elevation: 2.0,
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: 20.0),
-              ExpansionTile(
-                maintainState: true,
-                leading: CircleAvatar(
-                  backgroundColor:
-                      getPriorityColor(this.noteList[position].priority),
-                  child: getPriorityIcon(this.noteList[position].priority),
-                ),
-                title: Text(
-                  this.noteList[position].title,
-                  style: titleStyle,
-                ),
-                children: <Widget>[
-                  ListTile(
-                    leading: Text(this.noteList[position].date ?? ""),
-                  ),
-                  ListTile(
-                    title: Text('Description '),
-                    subtitle: Text(
-                      this.noteList[position].description ?? "",
+          child: Center(
+            child: ExpansionPanelList(
+              expansionCallback: (int index, bool status) {
+                setState(() {
+                  _activeMeterIndex =
+                      _activeMeterIndex == position ? null : position;
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _activeMeterIndex == position,
+                  headerBuilder: (BuildContext context, bool isExpanded) =>
+                      ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          getPriorityColor(this.noteList[position].priority),
+                      child: getPriorityIcon(this.noteList[position].priority),
+                    ),
+                    title: Text(
+                      this.noteList[position].title,
                       style: titleStyle,
                     ),
                   ),
-                  ListTile(
-                    leading: RaisedButton(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Icon(Icons.edit),
-                          Text(' EDIT'),
-                        ],
+                  body: Column(
+                    children: <Widget>[
+                      ListTile(
+                        visualDensity:
+                            VisualDensity(horizontal: 2, vertical: -4),
+                        leading: Text(
+                          this.noteList[position].date ?? "",
+                          style: titleStyle,
+                        ),
                       ),
-                      onPressed: () {
-                        navigateToDetail(this.noteList[position], 'Edit Note');
-                      },
-                    ),
-                    trailing: RaisedButton(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Icon(Icons.delete),
-                          Text(' DELETE'),
-                        ],
+                      ListTile(
+                        visualDensity:
+                            VisualDensity(horizontal: 0, vertical: -4),
+                        title: Text('Description '),
+                        subtitle: Text(
+                          this.noteList[position].description ?? "",
+                          style: titleStyle,
+                        ),
                       ),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (_) {
-                              return AlertDialog(
-                                title: Text("Delete This Note?"),
-                                content: Text(
-                                    'This Note Will Be Deleted Permanently. Are You Sure?'),
-                                actions: [
-                                  FlatButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  FlatButton(
-                                    child: Text('Delete'),
-                                    onPressed: () {
-                                      _delete(context, noteList[position]);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            });
-                      },
-                    ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ListTile(
+                              leading: RaisedButton(
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Icon(Icons.edit),
+                                    Text(' EDIT'),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  navigateToDetail(
+                                      this.noteList[position], 'Edit Note');
+                                },
+                              ),
+                              trailing: RaisedButton(
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Icon(Icons.delete),
+                                    Text(' DELETE'),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (_) {
+                                        return AlertDialog(
+                                          title: Text("Delete This Note?"),
+                                          content: Text(
+                                              'This Note Will Be Deleted Permanently. Are You Sure?'),
+                                          actions: [
+                                            FlatButton(
+                                              child: Text('Cancel'),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                            FlatButton(
+                                              child: Text('Delete'),
+                                              onPressed: () {
+                                                _delete(context,
+                                                    noteList[position]);
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
