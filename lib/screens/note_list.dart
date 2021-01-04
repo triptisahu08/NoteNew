@@ -35,7 +35,12 @@ class NoteListState extends State<NoteList> {
       appBar: AppBar(
         backgroundColor: Colors.teal[600],
         title: Text('Notes'),
-      ),
+        actions: [
+          GestureDetector(child: Icon(Icons.sticky_note_2_sharp,size: 30.0,),onTap: (){
+            alertDialog();
+          },)
+              ],
+    ),
 
       body: getNoteListView(),
       drawer: new Drawer(
