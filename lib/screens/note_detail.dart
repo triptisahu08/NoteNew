@@ -95,8 +95,10 @@ class NoteDetailState extends State<NoteDetail> {
 
                 // Third Element
                 Padding(
+
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: TextField(
+                    maxLines: 10,
                     controller: descriptionController,
                     style: textStyle,
                     onChanged: (value) {
