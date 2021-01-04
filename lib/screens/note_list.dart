@@ -53,7 +53,7 @@ class NoteListState extends State<NoteList> {
             children: <Widget>[
               SizedBox(height: 20.0),
               ExpansionTile(
-                maintainState: false,
+                maintainState: true,
                 leading: CircleAvatar(
                   backgroundColor:
                       getPriorityColor(this.noteList[position].priority),
@@ -65,8 +65,6 @@ class NoteListState extends State<NoteList> {
                 ),
                 children: <Widget>[
                   ListTile(
-                    //trailing:  Text('DATE:- '),
-                    // leading: Text('DATE:- '),
                     leading: Text(this.noteList[position].date ?? ""),
                   ),
                   ListTile(
