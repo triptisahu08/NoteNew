@@ -5,54 +5,42 @@ import 'package:flutter_app_notes/utils/database_helper.dart';
 import 'package:flutter_app_notes/screens/note_detail.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class NoteList extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
-
     return NoteListState();
   }
 }
 
 class NoteListState extends State<NoteList> {
-
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
   int count = 0;
 
   @override
   Widget build(BuildContext context) {
-
     if (noteList == null) {
       noteList = List<Note>();
       updateListView();
     }
 
     return Scaffold(
-
       appBar: AppBar(
         title: Text('Notes'),
       ),
-
       body: getNoteListView(),
-      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
           navigateToDetail(Note('', '', 2), 'Add Note');
         },
-
         tooltip: 'Add Note',
-
         child: Icon(Icons.add),
-
       ),
     );
   }
 
   ListView getNoteListView() {
-
     TextStyle titleStyle = Theme.of(context).textTheme.subhead;
 
     return ListView.builder(
@@ -62,29 +50,52 @@ class NoteListState extends State<NoteList> {
           color: Colors.white,
           elevation: 2.0,
           child: ListTile(
-
             leading: CircleAvatar(
-              backgroundColor: getPriorityColor(this.noteList[position].priority),
+              backgroundColor:
+                  getPriorityColor(this.noteList[position].priority),
               child: getPriorityIcon(this.noteList[position].priority),
             ),
-
-            title: Text(this.noteList[position].title, style: titleStyle,),
-
+            title: Text(
+              this.noteList[position].title,
+              style: titleStyle,
+            ),
             subtitle: Text(this.noteList[position].date),
-
             trailing: GestureDetector(
-              child: Icon(Icons.delete, color: Colors.grey,),
+              child: Icon(
+                Icons.delete,
+                color: Colors.grey,
+              ),
               onTap: () {
-                _delete(context, noteList[position]);
+                showDialog(
+                    context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: Text("Delete This Note?"),
+                        content: Text(
+                            'This Note Will Be Deleted Permanently. Are You Sure?'),
+                        actions: [
+                          FlatButton(
+                            child: Text('Cancel'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          FlatButton(
+                            child: Text('Delete'),
+                            onPressed: () {
+                              _delete(context, noteList[position]);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    });
               },
             ),
-
-
             onTap: () {
               debugPrint("ListTile Tapped");
-              navigateToDetail(this.noteList[position],'Edit Note');
+              navigateToDetail(this.noteList[position], 'Edit Note');
             },
-
           ),
         );
       },
@@ -122,22 +133,24 @@ class NoteListState extends State<NoteList> {
   }
 
   void _delete(BuildContext context, Note note) async {
-
     int result = await databaseHelper.deleteNote(note.id);
     if (result != 0) {
-      _showSnackBar(context, 'Note Deleted Successfully');
-      updateListView();
+      updateListView().then((value) {
+        _showSnackBar(context, 'Note Deleted Successfully');
+      }).catchError((onError) {
+        _showSnackBar(context, 'Some Error Occurred, Can\'t Delete Now');
+      });
     }
   }
 
   void _showSnackBar(BuildContext context, String message) {
-
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void navigateToDetail(Note note, String title) async {
-    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    bool result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return NoteDetail(note, title);
     }));
 
@@ -146,11 +159,9 @@ class NoteListState extends State<NoteList> {
     }
   }
 
-  void updateListView() {
-
+  Future updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-
       Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
       noteListFuture.then((noteList) {
         setState(() {
@@ -159,5 +170,6 @@ class NoteListState extends State<NoteList> {
         });
       });
     });
+    return dbFuture;
   }
 }
