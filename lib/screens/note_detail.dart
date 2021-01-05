@@ -23,6 +23,9 @@ class NoteDetailState extends State<NoteDetail> {
 
   String appBarTitle;
   Note note;
+  final _formKey = GlobalKey<FormState>();
+
+
 
   PickedFile _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -34,17 +37,17 @@ class NoteDetailState extends State<NoteDetail> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.title;
+    TextStyle textStyle = Theme.of(context).textTheme.headline6;
 
     titleController.text = note.title;
     descriptionController.text = note.description;
 
     return WillPopScope(
-        onWillPop: () {
-          // ignore: missing_return
-          // Write some code to control things, when user press Back navigation button in device navigationBar
-          moveToLastScreen();
-        },
+        // ignore: missing_return
+        onWillPop: (){
+         // Write some code to control things, when user press Back navigation button in device navigationBar
+              moveToLastScreen();
+             },
         child: Scaffold(
           appBar: AppBar(
             title: Text(appBarTitle),
@@ -57,152 +60,183 @@ class NoteDetailState extends State<NoteDetail> {
           ),
           body: Padding(
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
-            child: ListView(
-              children: <Widget>[
+            child: Form(
+              key:_formKey,
+              child: ListView(
+                children: <Widget>[
 
-                // First element (Priority Selector)
-                
-                ListTile(
-                  title: DropdownButton(
-                      items: _priorities.map((String dropDownStringItem) {
-                        return DropdownMenuItem<String>(
-                          value: dropDownStringItem,
-                          child: Text(dropDownStringItem),
-                        );
-                      }).toList(),
-                      style: textStyle,
-                      value: getPriorityAsString(note.priority),
-                      onChanged: (valueSelectedByUser) {
-                        setState(() {
-                          debugPrint('User selected $valueSelectedByUser');
-                          updatePriorityAsInt(valueSelectedByUser);
-                        });
-                      }),
-                ),
+                  // First element (Priority Selector)
 
-                // Second Element (Title)
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                  child: TextField(
-                    controller: titleController,
-                    style: textStyle,
-                    onChanged: (value) {
-                      debugPrint('Something changed in Title Text Field');
-                      updateTitle();
-                    },
-                    decoration: InputDecoration(
-                        labelText: 'Title',
-                        labelStyle: textStyle,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0))),
-                  ),
-                ),
-
-                // Third Element (Description)
-                Padding(
-
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                  child: TextField(
-                    maxLines: 10,
-                    controller: descriptionController,
-                    style: textStyle,
-                    onChanged: (value) {
-                      debugPrint('Something changed in Description Text Field');
-                      updateDescription();
-                    },
-                    decoration: InputDecoration(
-                        labelText: 'Description',
-                        labelStyle: textStyle,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0))),
-                  ),
-                ),
-
-                // Fourth Element (Image Picker Icon Button)
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                  child:  IconButton(
-                    icon: Icon(Icons.image_search_sharp),
-                    iconSize: 50,
-                    color: Colors.brown,
-                    tooltip: 'Select/Capture Image',
-                    onPressed: () {
-                      debugPrint("Icon Button Clicked");
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SimpleDialog(
-                                title: Text("Camera/Gallery"),
-                                children: <Widget>[
-                                  SimpleDialogOption(
-                                    onPressed: () {
-                                      Navigator.pop(context);//close the dialog box
-                                      _getImage(ImageSource.gallery);
-                                    },
-                                    child: const Text('Pick From Gallery'),
-                                  ),
-                                  SimpleDialogOption(
-                                    onPressed: () {
-                                      Navigator.pop(context);//close the dialog box
-                                      _getImage(ImageSource.camera);
-                                    },
-                                    child: const Text('Take A New Picture'),
-                                  ),
-                                ]);
+                  ListTile(
+                    title: DropdownButton(
+                        items: _priorities.map((String dropDownStringItem) {
+                          return DropdownMenuItem<String>(
+                            value: dropDownStringItem,
+                            child: Text(dropDownStringItem),
+                          );
+                        }).toList(),
+                        style: textStyle,
+                        value: getPriorityAsString(note.priority),
+                        onChanged: (valueSelectedByUser) {
+                          setState(() {
+                            debugPrint('User selected $valueSelectedByUser');
+                            updatePriorityAsInt(valueSelectedByUser);
                           });
-                      // setState(() {
-                      //
-                      // });
-                    },
+                        }),
                   ),
-                ),
 
-                // Fifth Element (Button)
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RaisedButton(
-                          color: Theme.of(context).primaryColorDark,
-                          textColor: Theme.of(context).primaryColorLight,
-                          child: Text(
-                            'Save',
-                            textScaleFactor: 1.5,
-                          ),
+                  // Second Element (Title)
+                  Padding(
+                    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                    child: TextFormField(
+                      validator:(value){
+                        if (value == null)
+                        {
+                          return 'Title Required';
+                        }
+
+                        return null;
+                      },
+                      controller: titleController,
+                      style: textStyle,
+                      onChanged: (value) {
+                        debugPrint('Something changed in Title Text Field');
+                        updateTitle();
+                      },
+                      decoration: InputDecoration(
+                          hintText: 'Title',
+                          labelStyle: textStyle,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0))),
+                    ),
+                  ),
+
+                  // Third Element (Description)
+                  Padding(
+                    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                    child: TextFormField(
+                      validator:(value){
+                        if (value == null || value.length<=10)
+                          {
+                            return 'Valid Description Required';
+                          }
+
+                        return null;
+                      },
+                      maxLines:1,
+                      controller: descriptionController,
+                      style: textStyle,
+                      onChanged: (value) {
+                        debugPrint('Something changed in Description Text Field');
+                        updateDescription();
+                      },
+                      decoration: InputDecoration(
+                          hintText: 'Description',
+                          labelStyle: textStyle,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0))),
+                    ),
+                  ),
+
+                  // Fourth Element (Image Picker Icon Button)
+                  Padding(
+                    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                    child:  Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.image_search_sharp),
+                          iconSize: 50,
+                          color: Colors.brown,
+                          tooltip: 'Select/Capture Image',
                           onPressed: () {
-                            setState(() {
-                              debugPrint("Save button clicked");
-                              _save();
-                            });
+                            debugPrint("Icon Button Clicked");
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SimpleDialog(
+                                      title: Text("Camera/Gallery"),
+                                      children: <Widget>[
+                                        SimpleDialogOption(
+                                          onPressed: () {
+                                            Navigator.pop(context);//close the dialog box
+                                            _getImage(ImageSource.gallery);
+                                          },
+                                          child: const Text('Pick From Gallery'),
+                                        ),
+                                        SimpleDialogOption(
+                                          onPressed: () {
+                                            Navigator.pop(context);//close the dialog box
+                                            _getImage(ImageSource.camera);
+                                          },
+                                          child: const Text('Take A New Picture'),
+                                        ),
+                                      ]);
+                                });
+                            // setState(() {
+                            //
+                            // });
                           },
                         ),
-                      ),
-                      Container(
-                        width: 5.0,
-                      ),
-                      note.id != null
-                          ? Expanded(
-                              child: RaisedButton(
-                                color: Theme.of(context).primaryColorDark,
-                                textColor: Theme.of(context).primaryColorLight,
-                                child: Text(
-                                  'Delete',
-                                  textScaleFactor: 1.5,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    debugPrint("Delete button clicked");
-                                    _delete();
-                                  });
-                                },
-                              ),
-                            )
-                          : Text(''),
+                        SizedBox(width: 10.0),
+                          _imageFile != null
+                              ? Image.asset(
+                            _imageFile.path,
+                            height: 100,
+                          ) : Image.asset(
+                            'assets/no_image.png',
+                            height: 100,)
                     ],
+                    ),
                   ),
-                ),
-              ],
+
+                  // Fifth Element (Button)
+                  Padding(
+                    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RaisedButton(
+                            color: Theme.of(context).primaryColorDark,
+                            textColor: Theme.of(context).primaryColorLight,
+                            child: Text(
+                              'Save',
+                              textScaleFactor: 1.5,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                debugPrint("Save button clicked");
+                                if(_formKey.currentState.validate()){ _save();}
+
+                              });
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: 5.0,
+                        ),
+                        note.id != null
+                            ? Expanded(
+                                child: RaisedButton(
+                                  color: Theme.of(context).primaryColorDark,
+                                  textColor: Theme.of(context).primaryColorLight,
+                                  child: Text(
+                                    'Delete',
+                                    textScaleFactor: 1.5,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      debugPrint("Delete button clicked");
+                                      _delete();
+                                    });
+                                  },
+                                ),
+                              )
+                            : Text(''),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ));
@@ -213,9 +247,12 @@ class NoteDetailState extends State<NoteDetail> {
     try{
       final pickedFile = await _picker.getImage(source: src);
       setState(() {
-        _imageFile = pickedFile;
+
+            _imageFile = pickedFile;
+
       });
-      debugPrint(_imageFile.path);
+      debugPrint(pickedFile.toString());
+      note.imagePath = _imageFile.path;
     }
     catch (exception){
       debugPrint(exception.toString());
@@ -264,7 +301,7 @@ class NoteDetailState extends State<NoteDetail> {
 
   // Save data to database
   void _save() async {
-    moveToLastScreen();
+     moveToLastScreen();
 
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;

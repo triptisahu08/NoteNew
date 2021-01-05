@@ -226,6 +226,17 @@ class NoteListState extends State<NoteList> {
                           style: titleStyle,
                         ),
                       ),
+
+
+
+                      /*
+                      ============ Image is being displayed only size and place of image in list is remaining please do the needful.
+                       */
+                      Image(image: AssetImage(this.noteList[position].imagePath ?? 'assets/no_image.png')),
+                      /*
+                      =============
+                       */
+
                       Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),

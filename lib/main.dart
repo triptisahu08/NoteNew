@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'NoteKeeper',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primarySwatch: Colors.deepPurple
+          primarySwatch: Colors.teal
       ),
       home: NoteList(),
     );
