@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 
 class NoteDetail extends StatefulWidget {
 
+  static const routeName = '/noteDetail';
+
+
   final String appBarTitle;
   final Note note;
 
@@ -14,6 +17,13 @@ class NoteDetail extends StatefulWidget {
   State<StatefulWidget> createState() {
 
     return NoteDetailState(this.note, this.appBarTitle);
+
+  NoteDetail({Key key, this.note, this.appBarTitle}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return NoteDetailState();
+
   }
 }
 
@@ -29,16 +39,17 @@ class NoteDetailState extends State<NoteDetail> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  NoteDetailState(this.note, this.appBarTitle);
+  NoteDetailState({this.note, this.appBarTitle});
 
   @override
   Widget build(BuildContext context) {
 
     TextStyle textStyle = Theme.of(context).textTheme.title;
 
-    titleController.text = note.title;
-    descriptionController.text = note.description;
+    titleController.text = note != null ? note.title : "";
+    descriptionController.text = note != null ? note.description : "";
 
+    String aT = appBarTitle ?? "";
     return WillPopScope(
         onWillPop: () {
           // ignore: missing_return
@@ -48,22 +59,29 @@ class NoteDetailState extends State<NoteDetail> {
 
         child: Scaffold(
           appBar: AppBar(
+
             title: Text(appBarTitle),
             leading: IconButton(icon: Icon(
                 Icons.arrow_back),
+
+            title: Text(aT),
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back),
                 onPressed: () {
                   // Write some code to control things, when user press back button in AppBar
                   moveToLastScreen();
                 }
             ),
           ),
+            ),
 
           body: Padding(
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
             child: ListView(
               children: <Widget>[
+                // First element (Priority Selector)
 
-                // First element
+
                 ListTile(
                   title: DropdownButton(
                       items: _priorities.map((String dropDownStringItem) {
@@ -77,6 +95,8 @@ class NoteDetailState extends State<NoteDetail> {
 
                       value: getPriorityAsString(note.priority),
 
+                      value:
+                          getPriorityAsString(note != null ? note.priority : 2),
                       onChanged: (valueSelectedByUser) {
                         setState(() {
                           debugPrint('User selected $valueSelectedByUser');
@@ -127,6 +147,49 @@ class NoteDetailState extends State<NoteDetail> {
                 ),
 
                 // Fourth Element
+                // Fourth Element (Image Picker Icon Button)
+                Padding(
+                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                  child: IconButton(
+                    icon: Icon(Icons.image_search_sharp),
+                    iconSize: 50,
+                    color: Colors.brown,
+                    tooltip: 'Select/Capture Image',
+                    onPressed: () {
+                      debugPrint("Icon Button Clicked");
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SimpleDialog(
+                                title: Text("Camera/Gallery"),
+                                children: <Widget>[
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); //close the dialog box
+                                      _getImage(ImageSource.gallery);
+                                    },
+                                    child: const Text('Pick From Gallery'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); //close the dialog box
+                                      _getImage(ImageSource.camera);
+                                    },
+                                    child: const Text('Take A New Picture'),
+                                  ),
+                                ]);
+                          });
+                      // setState(() {
+                      //
+                      // });
+                    },
+                  ),
+                ),
+
+                // Fifth Element (Button)
+
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: Row(
@@ -167,6 +230,26 @@ class NoteDetailState extends State<NoteDetail> {
                         ),
                       ),
 
+
+
+                      note != null
+                          ? Expanded(
+                              child: RaisedButton(
+                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorLight,
+                                child: Text(
+                                  'Delete',
+                                  textScaleFactor: 1.5,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    debugPrint("Delete button clicked");
+                                    _delete();
+                                  });
+                                },
+                              ),
+                            )
+                          : Text(''),
                     ],
                   ),
                 ),
@@ -176,6 +259,19 @@ class NoteDetailState extends State<NoteDetail> {
           ),
 
         ));
+  }
+
+  _getImage(ImageSource src) async {
+    debugPrint(src.toString());
+    try {
+      final pickedFile = await _picker.getImage(source: src);
+      setState(() {
+        _imageFile = pickedFile;
+      });
+      debugPrint(_imageFile.path);
+    } catch (exception) {
+      debugPrint(exception.toString());
+    }
   }
 
   void moveToLastScreen() {
@@ -225,7 +321,12 @@ class NoteDetailState extends State<NoteDetail> {
 
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
+
     if (note.id != null) {  // Case 1: Update operation
+
+    if (note.id != null) {
+      // Case 1: Update operation
+
       result = await helper.updateNote(note);
     } else { // Case 2: Insert Operation
       result = await helper.insertNote(note);
