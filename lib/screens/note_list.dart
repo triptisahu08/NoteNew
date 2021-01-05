@@ -161,8 +161,6 @@ class NoteListState extends State<NoteList> {
         ),
 
       ),
-      ),
-      body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal[600],
         onPressed: () {
