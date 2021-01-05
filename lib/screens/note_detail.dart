@@ -92,7 +92,7 @@ Variable for image picker
                     padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                     child: TextFormField(
                       validator:(value){
-                        if (value == null)
+                        if (value == null || value == '')
                         {
                           return 'Title Required';
                         }
