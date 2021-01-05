@@ -26,7 +26,9 @@ class NoteDetailState extends State<NoteDetail> {
   final _formKey = GlobalKey<FormState>();
 
 
-
+/*
+Variable for image picker
+ */
   PickedFile _imageFile;
   final ImagePicker _picker = ImagePicker();
 
