@@ -1,41 +1,39 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_notes/models/note.dart';
 import 'package:flutter_app_notes/utils/database_helper.dart';
 import 'package:flutter_app_notes/screens/note_detail.dart';
 import 'package:sqflite/sqflite.dart';
 
+
 class NoteList extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
+
     return NoteListState();
   }
 }
 
 class NoteListState extends State<NoteList> {
+
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
   int count = 0;
-  int _activeMeterIndex;
 
   @override
   Widget build(BuildContext context) {
+
     if (noteList == null) {
       noteList = List<Note>();
       updateListView();
     }
 
     return Scaffold(
+
       appBar: AppBar(
-        backgroundColor: Colors.teal[600],
         title: Text('Notes'),
-        actions: [
-          GestureDetector(child: Icon(Icons.sticky_note_2_sharp,size: 30.0,),onTap: (){
-            alertDialog();
-          },)
-              ],
-    ),
+      ),
 
       body: getNoteListView(),
       drawer: new Drawer(
@@ -162,21 +160,23 @@ class NoteListState extends State<NoteList> {
         ),
 
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal[600],
+     floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
           navigateToDetail(Note('', '', 2), 'Add Note');
         },
+
         tooltip: 'Add Note',
+
         child: Icon(Icons.add),
+
       ),
     );
   }
 
   ListView getNoteListView() {
-    TextStyle titleStyle = Theme.of(context).textTheme.subtitle1;
 
+    TextStyle titleStyle = Theme.of(context).textTheme.subhead;
 
     return ListView.builder(
       itemCount: count,
@@ -184,145 +184,33 @@ class NoteListState extends State<NoteList> {
         return Card(
           color: Colors.white,
           elevation: 2.0,
-          child: Center(
-            child: ExpansionPanelList(
-              expansionCallback: (int index, bool status) {
-                setState(() {
-                  _activeMeterIndex =
-                      _activeMeterIndex == position ? null : position;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  canTapOnHeader: true,
-                  isExpanded: _activeMeterIndex == position,
-                  headerBuilder: (BuildContext context, bool isExpanded) =>
-                      ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          getPriorityColor(this.noteList[position].priority),
-                      child: getPriorityIcon(this.noteList[position].priority),
-                    ),
-                    title: Text(
-                      this.noteList[position].title,
-                      style: titleStyle,
-                    ),
-                  ),
-                  body: Column(
-                    children: <Widget>[
-                      ListTile(
-                        visualDensity:
-                            VisualDensity(horizontal: 2, vertical: -4),
-                        leading: Text(
-                          this.noteList[position].date ?? "",
-                          style: titleStyle,
-                        ),
-                      ),
-                      ListTile(
-                        visualDensity:
-                            VisualDensity(horizontal: 0, vertical: -4),
-                        title: Text('Description '),
-                        subtitle: Text(
-                          this.noteList[position].description ?? "",
-                          style: titleStyle,
-                        ),
-                      ),
+          child: ListTile(
 
-
-
-                      /*
-                      ============ Image is being displayed only size and place of image in list is remaining please do the needful.
-                       */
-                      Image(image: AssetImage(this.noteList[position].imagePath ?? 'assets/no_image.png')),
-                      /*
-                      =============
-                       */
-
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: ListTile(
-                              leading: RaisedButton(
-                                child: Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Icon(Icons.edit),
-                                    Text(' EDIT'),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  navigateToDetail(
-                                      this.noteList[position], 'Edit Note');
-                                },
-                              ),
-                              trailing: RaisedButton(
-                                child: Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Icon(Icons.delete),
-                                    Text(' DELETE'),
-                                  ],
-                                ),
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) {
-                                        return AlertDialog(
-                                          title: Text("Delete This Note?"),
-                                          content: Text(
-                                              'This Note Will Be Deleted Permanently. Are You Sure?'),
-                                          actions: [
-                                            FlatButton(
-                                              child: Text('Cancel'),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                            FlatButton(
-                                              child: Text('Delete'),
-                                              onPressed: () {
-                                                _delete(context,
-                                                    noteList[position]);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            leading: CircleAvatar(
+              backgroundColor: getPriorityColor(this.noteList[position].priority),
+              child: getPriorityIcon(this.noteList[position].priority),
             ),
+
+            title: Text(this.noteList[position].title, style: titleStyle,),
+
+            subtitle: Text(this.noteList[position].date),
+
+            trailing: GestureDetector(
+              child: Icon(Icons.delete, color: Colors.grey,),
+              onTap: () {
+                _delete(context, noteList[position]);
+              },
+            ),
+
+
+            onTap: () {
+              debugPrint("ListTile Tapped");
+              navigateToDetail(this.noteList[position],'Edit Note');
+            },
+
           ),
         );
       },
-    );
-  }
-
-  void alertDialog()
-  {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text("Alert Dialog Box"),
-        content: Text("Work in Progress....."),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Text("okay",style: TextStyle(color:Colors.teal),),
-          ),
-        ],
-      ),
     );
   }
 
@@ -357,24 +245,22 @@ class NoteListState extends State<NoteList> {
   }
 
   void _delete(BuildContext context, Note note) async {
+
     int result = await databaseHelper.deleteNote(note.id);
     if (result != 0) {
-      updateListView().then((value) {
-        _showSnackBar(context, 'Note Deleted Successfully');
-      }).catchError((onError) {
-        _showSnackBar(context, 'Some Error Occurred, Can\'t Delete Now');
-      });
+      _showSnackBar(context, 'Note Deleted Successfully');
+      updateListView();
     }
   }
 
   void _showSnackBar(BuildContext context, String message) {
+
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void navigateToDetail(Note note, String title) async {
-    bool result =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return NoteDetail(note, title);
     }));
 
@@ -383,9 +269,11 @@ class NoteListState extends State<NoteList> {
     }
   }
 
-  Future updateListView() {
+  void updateListView() {
+
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
+
       Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
       noteListFuture.then((noteList) {
         setState(() {
@@ -394,6 +282,5 @@ class NoteListState extends State<NoteList> {
         });
       });
     });
-    return dbFuture;
   }
 }
