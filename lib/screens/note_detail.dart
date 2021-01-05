@@ -253,7 +253,7 @@ Variable for image picker
             _imageFile = pickedFile;
 
       });
-      debugPrint(pickedFile.toString());
+      //debugPrint(pickedFile.toString());
       note.imagePath = _imageFile.path;
     }
     catch (exception){
