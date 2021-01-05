@@ -5,14 +5,16 @@ import 'package:flutter_app_notes/utils/database_helper.dart';
 import 'package:intl/intl.dart';
 
 class NoteDetail extends StatefulWidget {
+  static const routeName = '/noteDetail';
+
   final String appBarTitle;
   final Note note;
 
-  NoteDetail(this.note, this.appBarTitle);
+  NoteDetail({Key key, this.note, this.appBarTitle}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return NoteDetailState(this.note, this.appBarTitle);
+    return NoteDetailState();
   }
 }
 
@@ -27,15 +29,16 @@ class NoteDetailState extends State<NoteDetail> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  NoteDetailState(this.note, this.appBarTitle);
+  NoteDetailState({this.note, this.appBarTitle});
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
 
-    titleController.text = note.title;
-    descriptionController.text = note.description;
+    titleController.text = note != null ? note.title : "";
+    descriptionController.text = note != null ? note.description : "";
 
+    String aT = appBarTitle ?? "";
     return WillPopScope(
         onWillPop: () {
           // ignore: missing_return
@@ -44,7 +47,7 @@ class NoteDetailState extends State<NoteDetail> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(appBarTitle),
+            title: Text(aT),
             leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
@@ -56,7 +59,12 @@ class NoteDetailState extends State<NoteDetail> {
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
             child: ListView(
               children: <Widget>[
+<<<<<<< Updated upstream
                 // First element
+=======
+                // First element (Priority Selector)
+
+>>>>>>> Stashed changes
                 ListTile(
                   title: DropdownButton(
                       items: _priorities.map((String dropDownStringItem) {
@@ -66,7 +74,8 @@ class NoteDetailState extends State<NoteDetail> {
                         );
                       }).toList(),
                       style: textStyle,
-                      value: getPriorityAsString(note.priority),
+                      value:
+                          getPriorityAsString(note != null ? note.priority : 2),
                       onChanged: (valueSelectedByUser) {
                         setState(() {
                           debugPrint('User selected $valueSelectedByUser');
@@ -111,7 +120,52 @@ class NoteDetailState extends State<NoteDetail> {
                   ),
                 ),
 
+<<<<<<< Updated upstream
                 // Fourth Element
+=======
+                // Fourth Element (Image Picker Icon Button)
+                Padding(
+                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                  child: IconButton(
+                    icon: Icon(Icons.image_search_sharp),
+                    iconSize: 50,
+                    color: Colors.brown,
+                    tooltip: 'Select/Capture Image',
+                    onPressed: () {
+                      debugPrint("Icon Button Clicked");
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SimpleDialog(
+                                title: Text("Camera/Gallery"),
+                                children: <Widget>[
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); //close the dialog box
+                                      _getImage(ImageSource.gallery);
+                                    },
+                                    child: const Text('Pick From Gallery'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); //close the dialog box
+                                      _getImage(ImageSource.camera);
+                                    },
+                                    child: const Text('Take A New Picture'),
+                                  ),
+                                ]);
+                          });
+                      // setState(() {
+                      //
+                      // });
+                    },
+                  ),
+                ),
+
+                // Fifth Element (Button)
+>>>>>>> Stashed changes
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: Row(
@@ -135,7 +189,7 @@ class NoteDetailState extends State<NoteDetail> {
                       Container(
                         width: 5.0,
                       ),
-                      note.id != null
+                      note != null
                           ? Expanded(
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColorDark,
@@ -162,6 +216,22 @@ class NoteDetailState extends State<NoteDetail> {
         ));
   }
 
+<<<<<<< Updated upstream
+=======
+  _getImage(ImageSource src) async {
+    debugPrint(src.toString());
+    try {
+      final pickedFile = await _picker.getImage(source: src);
+      setState(() {
+        _imageFile = pickedFile;
+      });
+      debugPrint(_imageFile.path);
+    } catch (exception) {
+      debugPrint(exception.toString());
+    }
+  }
+
+>>>>>>> Stashed changes
   void moveToLastScreen() {
     Navigator.pop(context, true);
   }
@@ -208,6 +278,7 @@ class NoteDetailState extends State<NoteDetail> {
 
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
+
     if (note.id != null) {
       // Case 1: Update operation
       result = await helper.updateNote(note);
