@@ -71,7 +71,8 @@ class NoteListState extends State<NoteList> {
               title: Text('New Note',style: TextStyle(fontSize: 16.0,),),
               subtitle: Text('Create your note here!'),
               onTap: (){
-                alertDialog();
+                //alertDialog();
+                Navigator.pop(context);
                 navigateToDetail(Note('', '', 2), 'Add Note');
               },
             ),
