@@ -72,7 +72,7 @@ class NoteListState extends State<NoteList> {
               subtitle: Text('Create your note here!'),
               onTap: (){
                 alertDialog();
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> NoteDetail()));
+                navigateToDetail(Note('', '', 2), 'Add Note');
               },
             ),
             new Divider(
