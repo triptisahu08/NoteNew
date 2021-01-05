@@ -5,10 +5,11 @@ class Note {
   String _description;
   String _date;
   int _priority;
+  String _imgPath;
 
-  Note(this._title, this._date, this._priority, [this._description]);
+  Note(this._title, this._date, this._priority, [this._description,this._imgPath]);
 
-  Note.withId(this._id, this._title, this._date, this._priority, [this._description]);
+  Note.withId(this._id, this._title, this._date, this._priority, [this._description,this._imgPath]);
 
   int get id => _id;
 
@@ -19,6 +20,8 @@ class Note {
   int get priority => _priority;
 
   String get date => _date;
+
+  String get imagePath => _imgPath;
 
   set title(String newTitle) {
     if (newTitle.length <= 255) {
@@ -42,6 +45,11 @@ class Note {
     this._date = newDate;
   }
 
+  set imagePath(String newPath) {
+    this._imgPath = newPath;
+  }
+
+
   // Convert a Note object into a Map object
   Map<String, dynamic> toMap() {
 
@@ -53,6 +61,7 @@ class Note {
     map['description'] = _description;
     map['priority'] = _priority;
     map['date'] = _date;
+    map['imagePath']=_imgPath;
 
     return map;
   }
@@ -64,5 +73,7 @@ class Note {
     this._description = map['description'];
     this._priority = map['priority'];
     this._date = map['date'];
+    this._imgPath = map['imagePath'];
+
   }
 }
