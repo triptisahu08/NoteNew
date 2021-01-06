@@ -25,7 +25,6 @@ class NoteDetailState extends State<NoteDetail> {
   Note note;
   final _formKey = GlobalKey<FormState>();
 
-
 /*
 Variable for image picker
  */
@@ -45,8 +44,8 @@ Variable for image picker
     descriptionController.text = note.description;
 
     return WillPopScope(
-      // ignore: missing_return
-        onWillPop: (){
+        // ignore: missing_return
+        onWillPop: () {
           // Write some code to control things, when user press Back navigation button in device navigationBar
           moveToLastScreen();
         },
@@ -63,10 +62,9 @@ Variable for image picker
           body: Padding(
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
             child: Form(
-              key:_formKey,
+              key: _formKey,
               child: ListView(
                 children: <Widget>[
-
                   // First element (Priority Selector)
 
                   ListTile(
@@ -91,9 +89,8 @@ Variable for image picker
                   Padding(
                     padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                     child: TextFormField(
-                      validator:(value){
-                        if (value == null)
-                        {
+                      validator: (value) {
+                        if (value == null) {
                           return 'Title Required';
                         }
 
@@ -117,19 +114,19 @@ Variable for image picker
                   Padding(
                     padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                     child: TextFormField(
-                      validator:(value){
-                        if (value == null || value.length<=10)
-                        {
+                      validator: (value) {
+                        if (value == null || value.length <= 10) {
                           return 'Valid Description Required';
                         }
 
                         return null;
                       },
-                      maxLines:1,
+                      maxLines: 1,
                       controller: descriptionController,
                       style: textStyle,
                       onChanged: (value) {
-                        debugPrint('Something changed in Description Text Field');
+                        debugPrint(
+                            'Something changed in Description Text Field');
                         updateDescription();
                       },
                       decoration: InputDecoration(
@@ -143,7 +140,7 @@ Variable for image picker
                   // Fourth Element (Image Picker Icon Button)
                   Padding(
                     padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
-                    child:  Row(
+                    child: Row(
                       children: [
                         IconButton(
                           icon: Icon(Icons.image_search_sharp),
@@ -160,17 +157,21 @@ Variable for image picker
                                       children: <Widget>[
                                         SimpleDialogOption(
                                           onPressed: () {
-                                            Navigator.pop(context);//close the dialog box
+                                            Navigator.pop(
+                                                context); //close the dialog box
                                             _getImage(ImageSource.gallery);
                                           },
-                                          child: const Text('Pick From Gallery'),
+                                          child:
+                                              const Text('Pick From Gallery'),
                                         ),
                                         SimpleDialogOption(
                                           onPressed: () {
-                                            Navigator.pop(context);//close the dialog box
+                                            Navigator.pop(
+                                                context); //close the dialog box
                                             _getImage(ImageSource.camera);
                                           },
-                                          child: const Text('Take A New Picture'),
+                                          child:
+                                              const Text('Take A New Picture'),
                                         ),
                                       ]);
                                 });
@@ -182,11 +183,13 @@ Variable for image picker
                         SizedBox(width: 10.0),
                         _imageFile != null
                             ? Image.asset(
-                          _imageFile.path,
-                          height: 100,
-                        ) : Image.asset(
-                          'assets/no_image.png',
-                          height: 100,)
+                                _imageFile.path,
+                                height: 100,
+                              )
+                            : Image.asset(
+                                'assets/no_image.png',
+                                height: 100,
+                              )
                       ],
                     ),
                   ),
@@ -207,8 +210,9 @@ Variable for image picker
                             onPressed: () {
                               setState(() {
                                 debugPrint("Save button clicked");
-                                if(_formKey.currentState.validate()){ _save();}
-
+                                if (_formKey.currentState.validate()) {
+                                  _save();
+                                }
                               });
                             },
                           ),
@@ -218,21 +222,22 @@ Variable for image picker
                         ),
                         note.id != null
                             ? Expanded(
-                          child: RaisedButton(
-                            color: Theme.of(context).primaryColorDark,
-                            textColor: Theme.of(context).primaryColorLight,
-                            child: Text(
-                              'Delete',
-                              textScaleFactor: 1.5,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                debugPrint("Delete button clicked");
-                                _delete();
-                              });
-                            },
-                          ),
-                        )
+                                child: RaisedButton(
+                                  color: Theme.of(context).primaryColorDark,
+                                  textColor:
+                                      Theme.of(context).primaryColorLight,
+                                  child: Text(
+                                    'Delete',
+                                    textScaleFactor: 1.5,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      debugPrint("Delete button clicked");
+                                      _delete();
+                                    });
+                                  },
+                                ),
+                              )
                             : Text(''),
                       ],
                     ),
@@ -246,17 +251,14 @@ Variable for image picker
 
   _getImage(ImageSource src) async {
     debugPrint(src.toString());
-    try{
+    try {
       final pickedFile = await _picker.getImage(source: src);
       setState(() {
-
         _imageFile = pickedFile;
-
       });
       debugPrint(pickedFile.toString());
       note.imagePath = _imageFile.path;
-    }
-    catch (exception){
+    } catch (exception) {
       debugPrint(exception.toString());
     }
   }
@@ -336,32 +338,32 @@ Variable for image picker
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text("Delete This Note?"),
-          content:
-          Text('This Note Will Be Deleted Permanently. Are You Sure?'),
-          actions: [
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            FlatButton(
-              child: Text('Delete'),
-              onPressed: () {
-                Navigator.pop(context);
-                helper.deleteNote(note.id).then((value) {
-                  moveToLastScreen();
-                  _showAlertDialog('Status', 'Note Deleted Successfully');
-                }).catchError((onError) {
-                  print("error");
-                  _showAlertDialog(
-                      'Status', 'Error Occurred While Deleting the Note');
-                });
-              },
-            ),
-          ],
-        ));
+              title: Text("Delete This Note?"),
+              content:
+                  Text('This Note Will Be Deleted Permanently. Are You Sure?'),
+              actions: [
+                FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  child: Text('Delete'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    helper.deleteNote(note.id).then((value) {
+                      moveToLastScreen();
+                      _showAlertDialog('Status', 'Note Deleted Successfully');
+                    }).catchError((onError) {
+                      print("error");
+                      _showAlertDialog(
+                          'Status', 'Error Occurred While Deleting the Note');
+                    });
+                  },
+                ),
+              ],
+            ));
   }
 
   void _showAlertDialog(String title, String message) {
