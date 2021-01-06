@@ -256,8 +256,10 @@ Variable for image picker
       setState(() {
         _imageFile = pickedFile;
       });
+      print(_imageFile);
       debugPrint(pickedFile.toString());
       note.imagePath = _imageFile.path;
+      print(note.imagePath);
     } catch (exception) {
       debugPrint(exception.toString());
     }
@@ -306,7 +308,6 @@ Variable for image picker
   // Save data to database
   void _save() async {
     moveToLastScreen();
-
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
     if (note.id != null) {
